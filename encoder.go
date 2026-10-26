@@ -37,23 +37,23 @@ const (
 
 var (
 	bufPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return new(bytes.Buffer)
 		},
 	}
 	prettyPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return new(bytes.Buffer)
 		},
 	}
 	encPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return NewEncoder()
 		},
 	}
 )
 
-func Logf(format string, v ...interface{}) {
+func Logf(format string, v ...any) {
 	log.Printf(format, v...)
 }
 

@@ -15,7 +15,7 @@ func TestEncoderNewEncoder(t *testing.T) {
 }
 
 func BenchmarkEncoderNewEncoder(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		NewEncoder()
 	}
 }
@@ -30,9 +30,8 @@ func TestEncoderGetEncoder(t *testing.T) {
 
 func BenchmarkEncoderGetEncoder(b *testing.B) {
 	_, w := io.Pipe()
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc := GetEncoder(w)
 		enc.Close()
 		enc.Release()
@@ -208,9 +207,8 @@ func BenchmarkEncoderEncodeKey(b *testing.B) {
 	enc := GetEncoder(nil)
 	defer enc.Release()
 	value := []byte("/foo/bar")
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.b.Reset()
 		enc.EncodeKey(value)
 	}
@@ -228,9 +226,8 @@ func BenchmarkEncoderObjectKey(b *testing.B) {
 	enc := GetEncoder(nil)
 	defer enc.Release()
 	value := []byte("/foo/bar")
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.b.Reset()
 		enc.ObjectKey(value)
 	}
@@ -267,9 +264,8 @@ func BenchmarkEncoderWriteUint32Key(b *testing.B) {
 	defer enc.Release()
 	value := uint32(473829)
 	key := []byte("/foo/bar")
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.b.Reset()
 		enc.WriteUint32Key(key, value, true)
 	}
@@ -306,9 +302,8 @@ func BenchmarkEncoderWriteUint64Key(b *testing.B) {
 	defer enc.Release()
 	value := uint64(473829)
 	key := []byte("/foo/bar")
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.b.Reset()
 		enc.WriteUint64Key(key, value, true)
 	}
@@ -345,9 +340,8 @@ func BenchmarkEncoderWriteFloat64Key(b *testing.B) {
 	defer enc.Release()
 	value := float64(0.473829)
 	key := []byte("/foo/bar")
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.b.Reset()
 		enc.WriteFloat64Key(key, value, true)
 	}
@@ -494,7 +488,7 @@ func BenchmarkEncoderPrettyPrint(b *testing.B) {
 	key := []byte("foo")
 	defer enc.Release()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		enc.ObjectStart()
 		enc.ObjectKey(key)
 		enc.ArrayStart()
@@ -553,10 +547,9 @@ func BenchmarkWriteUint32Timestamp(b *testing.B) {
 	enc := GetEncoder(nil)
 	defer enc.Release()
 	ts := uint32(1612530332)
-	b.ResetTimer()
 
 	b.Run("unix", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			enc.b.Reset()
 			enc.WriteUint32Timestamp([]byte("timestamp"), ts, false)
 		}
@@ -564,7 +557,7 @@ func BenchmarkWriteUint32Timestamp(b *testing.B) {
 
 	b.Run("utc", func(b *testing.B) {
 		enc.c.UTCTimestamps = true
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			enc.b.Reset()
 			enc.WriteUint32Timestamp([]byte("timestamp"), ts, false)
 		}
