@@ -36,6 +36,27 @@ BenchmarkWriteUint32Timestamp/unix-4         	 3384517	       367.8 ns/op	      
 BenchmarkWriteUint32Timestamp/utc-4          	 3393334	       365.2 ns/op	       0 B/op	       0 allocs/op
 ```
 
+## Comparison with the standard library (Go 1.27.3, Intel(R) Core(TM) i7-1260P)
+`compare_test.go` encodes the same document (an array of `{"id","name","count","ratio"}`
+records, verified byte-identical across encoders) with this Encoder, `encoding/json/jsontext`,
+`encoding/json/v2` and `encoding/json`. jsontext and json/v2 are still behind an experiment
+flag in Go 1.27, so the file only builds with it:
+```
+GOEXPERIMENT=jsonv2 go test -run=Compare -bench=Compare -benchmem
+```
+Memory: 32 records into a reused buffer. Stream: 10,000 records through an `io.Pipe`.
+```
+                         sec/op      B/op     allocs/op
+CompareMemory/Encoder    19.50µ      0        0
+CompareMemory/jsontext   10.83µ      0        0
+CompareMemory/json/v2    9.267µ      48       2
+CompareMemory/json/v1    9.494µ      2.0Ki    3
+CompareStream/Encoder    5.995m      13.2Ki   15
+CompareStream/jsontext   4.421m      618      6
+CompareStream/json/v2    4.097m      672      8
+CompareStream/json/v1    2.983m      9.1Ki    8
+```
+
 ## Example (todo: improve this example)
 ```
  func ApiHandler(ctx *fasthttp.RequestCtx) {
